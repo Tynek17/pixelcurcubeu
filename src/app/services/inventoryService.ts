@@ -1,3 +1,4 @@
+import { supabase } from '../../lib/supabase';
 import { Product, Sale, InventoryDataService } from '../types';
 
 const STORAGE_KEYS = {
@@ -187,6 +188,86 @@ export class LocalInventoryService implements InventoryDataService {
   }
 }
 
+export class SupabaseInventoryService implements InventoryDataService {
+  private client = supabase;
+
+  private safeDate(date: string | Date): Date {
+    return date instanceof Date ? date : new Date(date);
+  }
+
+  async loadInitialState(): Promise<{ products: Product[]; sales: Sale[] }> {
+    const [{ data: products, error: productsError }, { data: sales, error: salesError }] =
+      await Promise.all([
+        this.client.from<Product>('products').select('*'),
+        this.client
+          .from<Sale>('sales')
+          .select('*')
+          .order('date', { ascending: false }),
+      ]);
+
+    if (productsError) throw productsError;
+    if (salesError) throw salesError;
+
+    return {
+      products: products ?? [],
+      sales: normalizeSales(sales ?? []),
+    };
+  }
+
+  async createProduct(product: Omit<Product, 'id'>): Promise<Product> {
+    const createdProduct: Product = {
+      ...product,
+      id: Date.now().toString(),
+    };
+
+    const { error } = await this.client.from('products').insert(createdProduct);
+    if (error) throw error;
+
+    return createdProduct;
+  }
+
+  async updateProduct(id: string, product: Omit<Product, 'id'>): Promise<Product> {
+    const { data, error } = await this.client
+      .from('products')
+      .update(product)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data as Product;
+  }
+
+  async deleteProduct(id: string): Promise<void> {
+    const { error } = await this.client.from('products').delete().eq('id', id);
+    if (error) throw error;
+  }
+
+  async createSale(sale: Omit<Sale, 'id'>): Promise<Sale> {
+    const createdSale: Sale = {
+      ...sale,
+      id: Date.now().toString(),
+    };
+
+    const { error: salesError } = await this.client.from('sales').insert(createdSale);
+    if (salesError) throw salesError;
+
+    const saleItems = sale.items.map((item) => ({
+      ...item,
+      sale_id: createdSale.id,
+    }));
+
+    const { error: itemsError } = await this.client.from('sale_items').insert(saleItems);
+    if (itemsError) throw itemsError;
+
+    return createdSale;
+  }
+}
+
 export function createInventoryService(): InventoryDataService {
+  if (import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY) {
+    return new SupabaseInventoryService();
+  }
+
   return new LocalInventoryService();
 }
