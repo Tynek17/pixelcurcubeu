@@ -7,6 +7,7 @@ import { Toaster } from './components/ui/sonner';
 import { toast } from 'sonner';
 import { cn } from './components/ui/utils';
 import { createInventoryService, LocalInventoryService } from './services/inventoryService';
+import { hasSupabaseConfig } from '../lib/supabase';
 import { Product, Sale, ViewType } from './types';
 
 const inventoryService = createInventoryService();
@@ -19,6 +20,8 @@ export default function App() {
   const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log('Supabase config present:', hasSupabaseConfig());
+    console.log('Inventory service:', inventoryService.constructor.name);
     const loadState = async () => {
       try {
         const { products: initialProducts, sales: initialSales } = await inventoryService.loadInitialState();
