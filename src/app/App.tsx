@@ -23,8 +23,10 @@ export default function App() {
     console.log('Supabase config present:', hasSupabaseConfig());
     console.log('Inventory service:', inventoryService.constructor.name);
     const loadState = async () => {
+      console.log('Starting loadInitialState using', inventoryService.constructor.name);
       try {
         const { products: initialProducts, sales: initialSales } = await inventoryService.loadInitialState();
+        console.log('loadInitialState success:', initialProducts.length, 'products,', initialSales.length, 'sales');
         setProducts(initialProducts);
         setSales(initialSales);
       } catch (error) {
