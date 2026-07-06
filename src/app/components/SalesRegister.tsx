@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Badge } from './ui/badge';
 import { Plus, Trash2, ShoppingCart, X, Receipt, CreditCard, Banknote, Smartphone } from 'lucide-react';
@@ -152,19 +151,20 @@ export function SalesRegister({ products, sales, onAddSale }: SalesRegisterProps
           <CardContent className="space-y-4 pt-6">
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="sm:col-span-2 space-y-2">
-                <Label>Producto</Label>
-                <Select value={selectedProductId} onValueChange={setSelectedProductId}>
-                  <SelectTrigger className="border-gray-200 focus:border-green-500 focus:ring-green-500">
-                    <SelectValue placeholder="Seleccionar producto" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {products.filter(p => p.stock > 0).map(product => (
-                      <SelectItem key={product.id} value={product.id}>
-                        {product.name} - ${product.price.toLocaleString()} ({product.stock} disponibles)
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="product-select">Producto</Label>
+                <select
+                  id="product-select"
+                  value={selectedProductId}
+                  onChange={(e) => setSelectedProductId(e.target.value)}
+                  className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/40"
+                >
+                  <option value="">Seleccionar producto</option>
+                  {products.filter(p => p.stock > 0).map(product => (
+                    <option key={product.id} value={product.id}>
+                      {product.name} - ${product.price.toLocaleString()} ({product.stock} disponibles)
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="space-y-2">
                 <Label>Cantidad</Label>
@@ -260,32 +260,17 @@ export function SalesRegister({ products, sales, onAddSale }: SalesRegisterProps
             </div>
 
             <div className="space-y-2">
-              <Label>Método de Pago</Label>
-              <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                <SelectTrigger className="border-gray-200 focus:border-indigo-500 focus:ring-indigo-500">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Efectivo">
-                    <div className="flex items-center gap-2">
-                      <Banknote className="h-4 w-4" />
-                      Efectivo
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="Tarjeta">
-                    <div className="flex items-center gap-2">
-                      <CreditCard className="h-4 w-4" />
-                      Tarjeta
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="Transferencia">
-                    <div className="flex items-center gap-2">
-                      <Smartphone className="h-4 w-4" />
-                      Transferencia
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="payment-select">Método de Pago</Label>
+              <select
+                id="payment-select"
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+                className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/40"
+              >
+                <option value="Efectivo">Efectivo</option>
+                <option value="Tarjeta">Tarjeta</option>
+                <option value="Transferencia">Transferencia</option>
+              </select>
             </div>
 
             <div className="border-t pt-4 space-y-3 bg-gradient-to-br from-gray-50 to-indigo-50 -mx-6 px-6 py-4">
