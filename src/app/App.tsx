@@ -174,7 +174,7 @@ export default function App() {
               <Store className="h-6 w-6 text-indigo-600" />
             </div>
             <div>
-              <h1 className="text-white">PixelCurcubeu</h1>
+              <h1 className="text-white">Pixel Ink</h1>
               <p className="text-xs text-indigo-100">Sistema de Gestión</p>
             </div>
           </div>

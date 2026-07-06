@@ -1,4 +1,4 @@
-# PixelCurcubeu
+# Pixel Ink
 
 Aplicación de gestión de inventario y ventas con React + Vite.
 
